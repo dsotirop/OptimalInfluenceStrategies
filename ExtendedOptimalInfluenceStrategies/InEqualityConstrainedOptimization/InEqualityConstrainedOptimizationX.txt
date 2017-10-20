@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+This folder contains the code implementation for a series of functions and 
+scripts that perform the inequality constrained optimization of the extended 
+optimal influence stratagies estimation problem. That is, the code 
+implementations appearing in this folder consider that for the T1,T2, Lambda2
+and Lambda2 variables to be optimized the following equality holds:
+                      T1 + T2 <= K 
+                 Lambda1 + Lambda2 <= 1 [II]
+---------------------------------------------------------------------------
+CODE FUNCTIONS LIST:
+[1]: GeneralOptimalInfluenceGridSearcherX1.m (9 dimensional grid searcher).
+[2]: GeneralOptimalInfluenceGridSearcherX2.m (9 dimensional grid searcher).
+[3]: GeneralOptimalInfluencesX.m (Controls the nonlinear minimizer).
+[4]: NonLinearGeneralObjectiveMinimizerX.m (Nonlinear minimizer).
+[5]: GeneralObjectiveFunctionX.m (Objective function to be minimized).
+[6]: GeneralSoptimalX.m (Computes optimal limiting influence vector).
+[7]: consensus.m (Computes consensial limiting belief).
+[8]: plot_parameters_tuplesX.m (Performs plotting of a given 2-D / 3-D grid searching outcome).
+[9]: slice_plot_parameters_tuplesX.m (Slices and plots a given 3-D grid searching outcome).
+[10]: GeneralOptimalInfluenceRegions1X.m (Grid searcher for exporing counter-intuitive influence investment regions).
+[11]: plot_influence_regionsX.m (Performs 2-D plotting of counter-intuitive influence investment regions).

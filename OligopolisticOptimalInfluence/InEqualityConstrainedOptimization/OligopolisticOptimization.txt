@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+This folder contains the code implementation for a series of functions and 
+scripts that perform the inequality constrained optimization of the general 
+optimal influence stratagies estimation problem within the oligopolistic 
+context of two firms. That is, the code implementations appearing in this 
+folder considers that for the T1_A, T2_A, T1_B, T2_B variables to be  
+optimized the following inequalities hold:
+                      T1_A + T1_B <= 1 - Theta2 [I]
+                      T2_A + T2_B <= 1 - Theta1 [II]
+---------------------------------------------------------------------------
+CODE FUNCTIONS LIST:
+[1]: OligopolisticOptimalInfluenceGridSearcher.m (14 dimensional grid searhcer).
+[2]: OligopolisticOptimalInfluences.m (Controls the nonlinear minimizer by filtering the obtained solutions).
+[3]: NonLinearObjectiveFunctionMinimizer.m (Main optimization routine minimizing the squared sum of partial objectives).
+[4]: NonLinearObjectiveFunction.m (Computes the composite objective to be mininimized).
+[5]: OligopolisticSOptimal.m (Computes optimal limiting influence vector).
+[6]: OligopolisticXOptimal.m (Computes optimal limiting beliefs).
+[7]: OligopolisticPOptimal.m (Computes optimal prices).
+[8]: OligopolisticQOptimal.m (Computes optimal quantities).
+[9]: OligopolisticFOptimal.m (Computes optimal profits).
+[10]: SecondOrderConditionsTester.m (Computes the Hessian matrix and correspoding eigenvalues for each profit function
+[11]: LocalOptimaCharacterization.m (Characterizes the nature of the obtained optima based on the sign of the Hessian matrix eigenvalues).
+[12]: plot_parameters_tuples.m (Provides main plotting functionality).
+[13]: slice_plot_parameters_tuples.m (Provides slicing plotting functionality on a given 3-D grid searching outcome).
+[14]: ExtractClusterRepresentativeSolutions.m (Identifies groups of almost identical solutions).
