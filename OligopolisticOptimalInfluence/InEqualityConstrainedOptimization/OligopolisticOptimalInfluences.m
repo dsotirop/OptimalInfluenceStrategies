@@ -1,6 +1,6 @@
 function [T1_A_opt,T2_A_opt,T1_B_opt,T2_B_opt,Fval,OptFlag,DigitFlag] = OligopolisticOptimalInfluences(Lambda_A_1,Lambda_A_2,Lambda_B_1,Lambda_B_2,Theta1,Theta2,P_A_1,P_A_2,P_B_1,P_B_2,M,K,C,Gamma)
 
-% This function contols the nonlinear minimimization process provided by
+% This function contols the nonlinear minimization process provided by
 % the functions:
 % (i):   NonLinearObjectiveFunctionMimimizer
 % (ii):  SecondOrderConditionsTester

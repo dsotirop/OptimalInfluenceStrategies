@@ -85,8 +85,8 @@ for t = TRange
         if(isreal(Raa(ka)))
             TAopt = Raa(ka);
             Ra = [Ra;[TAopt,TB]];
-        end;
-    end;
+        end
+    end
     
     % Loop through the various roots of the polynomial Rbb:
     for kb = 1:1:length(Rbb)
@@ -94,9 +94,9 @@ for t = TRange
         if(isreal(Rbb(kb)))
             TBopt = Rbb(kb);
             Rb = [Rb;[TA,TBopt]];
-        end;
-    end;
-end;
+        end
+    end
+end
 
 % Plot the best response curves for Ra and Rb.
 PlotBestResponseCurves(Ra,Rb);

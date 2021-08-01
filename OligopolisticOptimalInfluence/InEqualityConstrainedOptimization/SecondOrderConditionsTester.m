@@ -1,7 +1,7 @@
 function [HF_A_Eigs,HF_B_Eigs] = SecondOrderConditionsTester(Solutions,Lambda_A_1,Lambda_A_2,Lambda_B_1,Lambda_B_2,Theta1,Theta2,P_A_1,P_A_2,P_B_1,P_B_2,M,K,C,Gamma)
 
 % This code function checks the second order optimality conditions for the
-% objective functions F_A and F_B to be maximizedd for the given quadraplets
+% objective functions F_A and F_B to be maximized for the given quadraplets
 % of solutions. Second Order Optimality tests are conducted by computing
 % the Hessian matrix for each configuration of input parameters.
 
@@ -12,7 +12,7 @@ function [HF_A_Eigs,HF_B_Eigs] = SecondOrderConditionsTester(Solutions,Lambda_A_
 % Computation of the Hessian matrix for both profit functions (F_A and F_B)
 % will not be performed based on symbolic computational operations.
   
-% Get the number of solutions to be tested with second order optimality.
+% Get the number of solutions to be tested for second order optimality.
 N = size(Solutions,1);
 
 

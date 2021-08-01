@@ -6,7 +6,7 @@ function [Da] = FirmAProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,T
 % meshgrid of all possible  (TA,TB) pairs which is constructed by  
 % corresponding vector of the form tA = [ta_min:dt:ta_max] and  
 % tB = [tb_min:dt:tb_max], given the external optimization parameters. 
-%  Mind that the correct construction of the meshgrid implies that the 
+% Mind that the correct construction of the meshgrid implies that the 
 % lengths of the initial vectors tA and tB are equal.
 
 % Da will be composed by the polynomial coefficients and corresponding
@@ -63,12 +63,11 @@ else
    Va = zeros(rb,cb);
    for t = 1:1:length(CUa)
       Ua = Ua + CUa(t)*TUa{t};      
-   end;
+   end
    for t = 1:1:length(CVa)
       Va = Va + CVa(t)*TVa{t};
-   end;
+   end
    Da = Ua ./ Va;
-end;
-
 end
 
+end

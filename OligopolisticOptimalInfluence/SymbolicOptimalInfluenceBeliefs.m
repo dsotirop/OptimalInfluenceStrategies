@@ -18,8 +18,8 @@ syms Lambda_B_1 Lambda_B_2 Lambda_B
 % The following two lines of code should be uncommented in case this script
 % is not to be executed inside the GeneralOptimalInfluencePricesQuantities 
 % script.
-% syms T1_A T1_B
-% syms T2_A T2_B
+syms T1_A T1_B
+syms T2_A T2_B
 
 syms Theta1 Theta2
 syms VSA VS1 VS2 VSB

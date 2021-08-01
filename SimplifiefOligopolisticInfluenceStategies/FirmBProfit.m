@@ -59,12 +59,11 @@ else
    Qb = zeros(rb,cb);
    for t = 1:1:length(CPb)
       Pb = Pb + CPb(t)*TPb{t};      
-   end;
+   end
    for t = 1:1:length(CQb)
       Qb = Qb + CQb(t)*TQb{t};
-   end;
+   end
    fb = Pb ./ Qb;
-end;
-
 end
 
+end

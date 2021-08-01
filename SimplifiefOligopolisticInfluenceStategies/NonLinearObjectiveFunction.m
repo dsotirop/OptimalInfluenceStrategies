@@ -1,40 +1,44 @@
 function [F] = NonLinearObjectiveFunction(T,C,G,LA,LB,PA,PB,alpha,beta,gamma)
 
-% This function defines the most general form of the system of nonlinear
-% equations that has to be solved in order to obtain the optimal influence
-% strategies within the simplified oligopolostic environment of the two
-% firms {Firm A, Firm B} and one consumer {C}. However, the system of
-% nonlinear equations will be reformulated as a nonlinear function
-% optimization problem.
+% This code file defines the non-linear objective function for the combined
+% optimization problem which is derived for the two-player continuous game
+% with coupled constraints according to the methodology presented in
+% "Algoritms of Informatics" and "Mathematics and Its Applications".
 
 % The input vector T is assumed to be of the form:
-% T = [TA TB]
+% T = [TA TB].
 
-% Get the influence related variables (the actual optimization varibles).
+% Get the influence-related variables (the actual optimization variables).
 TA = T(1);
 TB = T(2);
 
-% The system of nonlinear equations corresponds to the first order
-% conditions on the profit functions fa and fb for products A and B. In 
-% fact, we have a nonlinear system of the following form:
-%          [F1 F2] = [F(1) F(2)] =  [0 0] [I]
-% where
-%               d fa                  d Fb
-%       F(1) = --------  and F(2) = -------- [II] 
-%               d TA                  d Tb
-
-F(1) = FirmAProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TB);
-F(2) = FirmBProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TB);
-
-% Finally, the nonlinear objective function to be minimized will be given
-% as:
-%                                    2         2     
-%                      F(T) = (F1 - 0)+ (F2 - 0) 
+% The objective function of the combined minimization problem may be
+% formulated as:
 %
-% where each Fi with i in {1,2} corresponds to a particular equation of
-% the original system.
+% F = -[Da * TA + Db * TB] [1] where:
+% 
+%               d fa(TA,TB)                       d fb(TA,TB)
+% Da(TA,TB) = -------------- [2] and Db(TA,TB) = -------------- [3]
+%                 d TA                               d TB 
+%
+% According to the derivations conducted within the scope of
+% the script file "SymbolicSimplifiedOligopolisticInfluenceModelQuadratic.m"
+% it is known that the first-order derivatives Da and Db with respect to TA
+% and TB are fractional function of the of form:
+%
+%              Ua(TA,TB)                       Ub(TA,TB)
+% Da(TA,TB) = ----------- [4] and Db(TA,TB) = ----------- [5]
+%              V(TA,TB)                         V(TA,TB) 
+%
+% Ua and Ub are 4th degree polynomials with respect to TA and TB.
+% V is a 3rd degree polynomial with respect to TA or TB.
 
-F = sum(F.^2);
+% Compute the values of the first order derivatives Da and Db.
+Da = FirmAProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TB);
+Db = FirmBProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TB);
+
+% Evaluate the combined optimization objective.
+F = -(Da * TA + Db * TB);
 
 end
 

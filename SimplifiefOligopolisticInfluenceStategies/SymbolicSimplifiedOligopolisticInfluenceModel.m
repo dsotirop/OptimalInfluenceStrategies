@@ -4,7 +4,7 @@
 % one consumer C.
 
 clc
-clear all
+clear
 
 % Setup the network-related symbolic variables.
 syms LA LB % These symbolic variables capture the direct influnce exerted 
@@ -62,7 +62,7 @@ S = [SA;SC;SB];
 Ssum = simplify(collect(expand(sum(S))));
 if(Ssum==1)
     fprintf('Elements of S sum up to 1\n');
-end;
+end
 
 % Accumulate initial beliefs for product A.
 PPA = [PAA PA PBA];
@@ -268,7 +268,7 @@ end;
 
 % However, the expressions for Ua(TA,TB) and Ub(TA,TB) are proven to be 
 % third-degree polynamials with respect to a monomial of the form: 
-% та^(d_a)*TB^(d_b) where d_a + d_b <= 3.
+% О©╫О©╫^(d_a)*TB^(d_b) where d_a + d_b <= 3.
 % Therefore, the expressions Ra and Rb are not exclusively functions of the
 % variables TB and TA but they are in fact bivariate functions of TA and TB
 % such that TA_star = Ra(TA,TB) and TB_star = Rb(TA,TB).

@@ -59,12 +59,12 @@ else
    Qa = zeros(rb,cb);
    for t = 1:1:length(CPa)
       Pa = Pa + CPa(t)*TPa{t};      
-   end;
+   end
    for t = 1:1:length(CQa)
       Qa = Qa + CQa(t)*TQa{t};
-   end;
+   end
    fa = Pa ./ Qa;
-end;
+end
 
 
 end

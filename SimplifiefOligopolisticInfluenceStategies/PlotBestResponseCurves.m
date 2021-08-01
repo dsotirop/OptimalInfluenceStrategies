@@ -22,7 +22,7 @@ TBmin = min(TBopt);
 TBmax = max(TBopt);
 
 % Set the number of possible equilibrium points.
-Neq = 6;
+Neq = 1;
 
 % Compute all the pairwise Manhattan distances between points in Ra and Rb.
 Dab = mandist(Ra,Rb');
@@ -58,17 +58,17 @@ for k = 1:1:Neq
     IJeq = [IJeq;[i j]];
     Peq = [Peq;[Ra(i,1),Ra(i,2)]];
     Peq = [Peq;[Rb(j,1),Rb(j,2)]];
-end;
+end
 
 % Create new plotting figure for the best response curves.
 figure('Name','Simplified Oligopolistic Game Best Responses');
 clf
 hold on
 % Plot the individual reaction functions.
-plot(TAopt,TB,'.r','LineWidth',2);
-plot(TA,TBopt,'.g','LineWidth',2);
+plot(TAopt,TB,'-.','LineWidth',1.5);
+plot(TA,TBopt,'-.','LineWidth',1.5);
 % Plot the candidate equilibrium points.
-plot(Peq(:,1),Peq(:,2),'*k','LineWidth',1);
+plot(Peq(:,1),Peq(:,2),'ok','LineWidth',2.0);
 % Set axis limits.
 axis([TAmin max(TAmax,1) TBmin max(TBmax,1)]);
 grid on

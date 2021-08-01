@@ -4,16 +4,16 @@
 % one consumer C.
 
 % This script file is an extension to the original 
-% "SymbolicSimplifiedInfluenceModel" .m file with the only differentation
+% "SymbolicSimplifiedInfluenceModel.m" file with the only differentation
 % being the addition of a quadratic cost term on the expressions for the
 % profits of the two firms A and B. Thus, the expression for the two
 % profits function will be subsequently defined as:
 % (i):  FA_opt = (pA_opt - C)^2 - G * TA^2
 % (ii): FB_opt = (pB_opt - C)^2 - G * TB^2
 
-
+% Clear command window and workspace.
 clc
-clear all
+clear
 
 % Setup the network-related symbolic variables.
 syms LA LB % These symbolic variables capture the direct influnce exerted 
@@ -71,7 +71,7 @@ S = [SA;SC;SB];
 Ssum = simplify(collect(expand(sum(S))));
 if(Ssum==1)
     fprintf('Elements of S sum up to 1\n');
-end;
+end
 
 % Accumulate initial beliefs for product A.
 PPA = [PAA PA PBA];
@@ -106,8 +106,8 @@ QA = XA - pA + M*pB - K*XB;
 QB = XB - pB + M*pA - K*XA;
 
 % Define the profit functions for the two firms A and B.
-FA = QA*(pA - C) - G*TA;
-FB = QB*(pB - C) - G*TB;
+FA = QA*(pA - C) - G*TA^2;
+FB = QB*(pB - C) - G*TB^2;
 
 % Compute the first derivative of FA with respect to pA.
 DFA_pA = diff(FA,pA);
@@ -131,7 +131,7 @@ pB_star = solve(DFB_pB==0,pB);
 % (i)  pA_opt may be obtained by solving with respect to pA the equation
 %      pA = Fa(Fb(pA)).
 % (ii) pB_opt may be obtained by solving with respect to pB the equation
-%      pB = Fb(Fa(pA)).
+%      pB = Fb(Fa(pB)).
 
 % Make copies of the original variables in order to perform the necessary
 % substitutions.
@@ -209,14 +209,94 @@ FA_opt = collect(FA_opt,[XA,XB]);
 FB_opt = collect(FB_opt,[XA,XB]);
 
 % -------------------------------------------------------------------------
-% SYMBOLIC COMPUTATIONS FOR THE CASE LA = LB = L and PA = PB = P
+% SYMBOLIC COMPUTATIONS ON THE REBENUE COMPONENTS OF THE PROFIT FUNCTIONS
 % -------------------------------------------------------------------------
+% Obtain the optimal expressions for the revenues of the two firms.
+RA_opt = (ppA - C)^2;
+RB_opt = (ppB - C)^2;
+% Symbolic expressions for RA_opt and RB_opt should be re-expressed as
+% functions of TA and TB. The newly acquired expressions will be identified
+% by Ra and Rb.
+Ra = subs(RA_opt,[XA,XB],[XXA,XXB]);
+Rb = subs(RB_opt,[XA,XB],[XXA,XXB]);
+% Express revenue functions Ra and Rb as fractions of polynomials with
+% respect to both TA and TB in the following form:
+%
+%        Lx
+% Rx = ------ , where x in {a,b}.
+%        Mx
+%
+[La,Ma] = numden(Ra);
+[Lb,Mb] = numden(Rb);
+% Check whether both fractional expressions for Ra and Rb share the same
+% denumerator.
+if((Ma-Mb)==0)
+    fprintf('Revenue denumerators of Ra and Rb are equal\n');
+end
+% Extract the polynomial coefficients and corresponding monomial terms for 
+% La, Ma and Lb, Mb with respect to both TA and TB.
+[CLa,TLa] = coeffs(La,[TA TB]);
+[CMa,TMa] = coeffs(Ma,[TA TB]);
+[CLb,TLb] = coeffs(Lb,[TA TB]);
+[CMb,TMb] = coeffs(Mb,[TA TB]);
+% Compute the first-order derivatives of the revenue functions for the two
+% firms with repsect to TA and TB accordingly.
+DRa = diff(Ra,TA);
+DRb = diff(Rb,TB);
+% Express the above quantities as fractions of the following form:
+%
+%         Gx
+% DRx = ------ , where x in {a,b}.
+%         Sx
+%
+[Ga,Sa] = numden(DRa);
+[Gb,Sb] = numden(DRb);
+
+% Check whether both expressions Sa and Sb are the same.
+if((Sa-Sb)==0)
+    fprintf('Revenue first derivative denumerators Sa and Sb are equal\n');
+end
+
+% Extract the polynomial coefficients and corresponding monomial terms for 
+% Ga, Sa and Gb, Sb with respect to both TA and TB.
+[CGa,TGa] = coeffs(Ga,[TA TB]);
+[CSa,TSa] = coeffs(Sa,[TA TB]);
+[CGb,TGb] = coeffs(Gb,[TA TB]);
+[CSb,TSb] = coeffs(Sb,[TA TB]);
+% Compute the second-order derivatives of the revenue functions for the two
+% firms with respect to TA and TB accoridingly.
+DDRa = diff(DRa,TA);
+DDRb = diff(DRb,TB);
+% Express the above quantities as fractions of the following form:
+%
+%          Hx
+% DDRx = ------ , where x in {a,b}.
+%          Ox
+%
+[Ha,Oa] = numden(DDRa);
+[Hb,Ob] = numden(DDRb);
+
+% Check whether both expressions Sa and Sb are the same.
+if((Oa-Ob)==0)
+    fprintf('Revenue second derivative denumerators Oa and Ob are equal\n');
+end
+
+% Extract the polynomial coefficients and corresponding monomial terms for
+% Ha, Oa and Hb, Ob with respect to both TA and TB.
+[CHa,THa] = coeffs(Ha,[TA TB]);
+[COa,TOa] = coeffs(Oa,[TA TB]);
+[CHb,THb] = coeffs(Hb,[TA TB]);
+[COb,TOb] = coeffs(Ob,[TA TB]);
+
 % Symbolic expressions for FA_opt and FB_opt should be re-expressed as 
 % functions of TA and TB. The newly acquired expressions will be identified 
 % by fa and fb.
 fa  = subs(FA_opt,[XA,XB],[XXA,XXB]);
 fb  = subs(FB_opt,[XA,XB],[XXA,XXB]);
 
+% -------------------------------------------------------------------------
+% SYMBOLIC COMPUTATIONS FOR THE CASE LA = LB = L and PA = PB = P
+% -------------------------------------------------------------------------
 % Uncomment the following block of code in order to enforce LA = LB = L
 % and PA = PB = P.
 % Define additional symbolic variables in order to perform the addtional
@@ -226,6 +306,10 @@ fb  = subs(FB_opt,[XA,XB],[XXA,XXB]);
 % syms L P
 % fa = subs(fa,[LA LB PA PB],[L L P P]);
 % fb = subs(fb,[LA LB PA PB],[L L P P]);
+
+% Uncomment the following block of code in order to enforce LA = LB = 1.
+% fa = subs(fa,[LA LB],[1 1]);
+% fb = subs(fb,[LA LB],[1 1]);
 
 
 % Extract some additional insights concerning the expressions of fa and fb.
@@ -241,8 +325,8 @@ fb  = subs(FB_opt,[XA,XB],[XXA,XXB]);
 % Check whether both fractional expressions for fa and fb share the same
 % denumerator.
 if((Qa-Qb)==0)
-    fprintf('Profit denumerators Qa and Qb are the same\n');
-end;
+    fprintf('Profit denumerators Qa and Qb are equal\n');
+end
 
 % Extract the polynomial expressions and corresponding monomial terms for 
 % Pa,Qa and Pb,Qb with respect to both TA and TB.
@@ -265,8 +349,8 @@ Db = diff(fb,TB);
 [Ub,Vb] = numden(Db);
 % Check that denumerators for both expressions (Va and Vb) are equal.
 if((Va-Vb)==0)
-    fprintf('Profit derivative denumerators Va and Vb are equal!\n');
-end;
+    fprintf('Profit first derivative denumerators Va and Vb are equal!\n');
+end
 
 % Extract the polynomial expressions and corresponding monomial terms for 
 % Ua,Va and Ub,Vb with respect to both TA and TB.
@@ -284,7 +368,7 @@ end;
 
 % However, the expressions for Ua(TA,TB) and Ub(TA,TB) are proven to be 
 % fourth-degree polynamials with respect to a monomial of the form: 
-% та^(d_a)*TB^(d_b) where d_a + d_b <= 4.
+% TA^(d_a)*TB^(d_b) where d_a + d_b <= 4.
 % Therefore, the expressions Ra and Rb are not exclusively functions of the
 % variables TB and TA but they are in fact bivariate functions of TA and TB
 % such that TA_star = Ra(TA,TB) and TB_star = Rb(TA,TB).
@@ -328,6 +412,11 @@ DDb = diff(Db,TB);
 %         Za                 Zb
 [Wa,Za] = numden(DDa);
 [Wb,Zb] = numden(DDb);
+
+% Check that denumerators for both expressions (Za and Zb) are equal.
+if((Za-Zb)==0)
+    fprintf('Profit second derivative denumerators Za and Zb are equal!\n');
+end
 
 % Extract the polynomial expressions and corresponding monomial terms for 
 % Wa,Za and Wb,Zb with respect to both TA and TB.

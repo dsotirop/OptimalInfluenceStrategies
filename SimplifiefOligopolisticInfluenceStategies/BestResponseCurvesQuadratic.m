@@ -33,14 +33,20 @@ clear all
 
 % Firstly, we need to define the fundamental parameters of the particular
 % instance of the Simplified Oligopolistic game.
-LA = 0.5;
-LB = 0.5;
-PA = 0.2;
-PB = 0.2;
-M = 0.1;
+LA = 0.25;
+LB = 0.25;
+PA = 0.4;
+PB = 0.4;
+M = 0.3;
 K = 0.1;
 C = 0.0001;
-G = 0.3; % Mind that G is the Gamma parameter defined elsewhere.
+G = 0.2; % Mind that G is the Gamma parameter defined elsewhere.
+
+% Found two equilibrium points for LA=LB=0.25, PA=0.1, PB=0.3, M=K=0.3, 
+% C = 0.0001 and G = 0.2
+
+% Found three equilibrium points for LA=LB=0.25, PA=PB=0.1, M=K=0.3, 
+% C = 0.0001 and G = 0.2
 
 % Additional parameters definition.
 alpha = (K*M - 2) / (M^2 - 4);
@@ -90,24 +96,38 @@ gamma = C / (M - 2);
 % SDa(p) = {(DDa(p),DDb(p)): for all p = (TA*(t),t) in Ra} [7].
 % SDb(p) = {(DDa(p),DDb(p)): for all p = (t,TB*(t)) in Rb} [8].
 
+% Mind that the utilized extended containers are formed by grouping
+% together solution points without taking into consideration the fact that
+% the constituents points are not real numbers.
 
 % Define the dt parameter controlling the density of the TRange interval.
-dt = 0.01;
+dt = 0.001;
 % Define the corresponding TRange interval.
 TRange = [0:dt:1.0];
 % Initialize curve containers Ra and Rb.
 Ra = [];
 Rb = [];
+% Initialize extended curve containers for Ra and Ra.
+RaX = [];
+RbX = [];
 % Initialize the first order derivative containers FDa and FDb for the  
 % points pertaining to the reaction curves Ra and Rb respectively.
 FDa = [];
 FDb = [];
+% Initialize the extended first order derivative containers FDa and FDb   
+% for the points pertaining to the reaction curves Ra and Rb respectively.
+FDaX = [];
+FDbX = [];
 % Initialize the second order derivative containers SDa and SDb for the  
 % points pertaining to the reaction curves Ra and Rb respectively.
 SDa = [];
 SDb = [];
+% Initialize the extended second order derivative containers SDa and SDb   
+% for the points pertaining to the reaction curves Ra and Rb respectively.
+SDaX = [];
+SDbX = [];
 
-% Loop through the various values for both the independent parameters TA
+% Loop through the various values for both independent parameters TA
 % and TB.
 for t = TRange
     % Set the values of TA and TB for the reaction curves Rb and Ra
@@ -144,8 +164,18 @@ for t = TRange
             DDb = FirmBProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TAopt,TB);
             FDa = [FDa;[Da,Db]];
             SDa = [SDa;[DDa,DDb]];
-        end;
-    end;
+        end
+        % Populate the corresponding extended containers irrepsective of
+        % whether the associated roots are real numbers.
+        TAopt = Raa(ka);
+        RaX = [RaX;[TAopt,TB]];
+        Da = FirmAProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TAopt,TB);
+        Db = FirmBProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TAopt,TB);
+        DDa = FirmAProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TAopt,TB);
+        DDb = FirmBProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TAopt,TB);
+        FDaX = [FDaX;[Da,Db]];
+        SDaX = [SDaX;[DDa,DDb]];
+    end
     
     % Loop through the various roots of the polynomial Rbb:
     for kb = 1:1:length(Rbb)
@@ -163,9 +193,19 @@ for t = TRange
             DDb = FirmBProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TBopt);
             FDb = [FDb;[Da,Db]];
             SDb = [SDb;[DDa,DDb]];
-        end;
-    end;
-end;
+        end
+        % Populate the corresponding extended containers irrepsective of
+        % whether the associated roots are real numbers.
+        TBopt = Rbb(kb);
+        RbX = [RbX;[TA,TBopt]];
+        Da = FirmAProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TBopt);
+        Db = FirmBProfitFirstDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TBopt);
+        DDa = FirmAProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TBopt);
+        DDb = FirmBProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TBopt);
+        FDbX = [FDbX;[Da,Db]];
+        SDbX = [SDbX;[DDa,DDb]];
+    end
+end
 
 % Plot the best response curves for Ra and Rb.
 PlotBestResponseCurves(Ra,Rb);

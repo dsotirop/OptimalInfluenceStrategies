@@ -65,7 +65,7 @@ Beq = [];
 %                   T1_A + T1_B <= 1 - Theta2 [I]
 %                   T2_A + T2_B <= 1 - Theta1 [II]
 %
-% Given, that T = [T1_A;T2_A;T1_B;T2_B], matrices A and B will be of the
+% Given that T = [T1_A;T2_A;T1_B;T2_B], matrices A and B will be of the
 % following form:
 %                |1 0 1 0|         |1 - Theta2|
 %            A = |0 1 0 1| and B = |1 - Theta1| 

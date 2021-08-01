@@ -1,0 +1,390 @@
+This code folder contains the necessary script and function files which are
+required in order to formulate the constrained two-player continuos game as 
+a combined optimization problem.
+-------------------------------------------------------------------------------------------------------------------
+The formulation of the KKT conditions for the optimization problem addressed
+by the first firm (Firm A) are the following:  
+------------------------------------------------------------------------------------------------------------------- 
+                               [OP I]
+-------------------------------------------------------------------------------------------------------------------
+PRIMARY OPTIMIZATION VARIABLES: [TA TB] (Mind that TB is actually a 
+                                                       parameter for OP I).
+LAGRANGIAN OPTIMIZATION VARIABLES: [LambdaA_1 LambdaA_2]
+LAGRANGIAN FUNCTION: La(TA,TB) = fa(TA,TB) + LambdaA_1 * TA + LambdaA_2 * (1-TB-TA)
+CONSTRAINTS: LambdaA_1,LambdaA_2 >= 0, 0 <= TA <= 1-TB
+------------------------------------------------------------------------------------------------------------------- 
+                               [OP II]
+-------------------------------------------------------------------------------------------------------------------
+PRIMARY OPTIMIZATION VARIABLES: [TA TB] (Mind that TA is actually a 
+                                                       parameter for OP II).
+LAGRANGIAN OPTIMIZATION VARIABLES: [LambdaB_1 LambdaB_2]
+LAGRANGIAN FUNCTION: Lb(TA,TB) = fb(TA,TB) + LambdaB_1 * TB + LambdaB_2 * (1-TA-TB)
+CONSTRAINTS: LambdaB_1,LambdaB_2 >= 0, 0 <= TB <= 1-TA
+------------------------------------------------------------------------------------------------------------------- 
+                        [ADDITIONAL DEFINITIONS]
+             
+                       d Fa(TA,TB)           d Fa(TA,TB)  
+                  Da = -----------  and Db = -----------
+                          d TA                 d TB
+
+-------------------------------------------------------------------------------------------------------------------
+                               [KKT OP I]
+-------------------------------------------------------------------------------------------------------------------
+[I.1]: DLa(TA,TB) = Da(TA,TB) + LambdaA_1 - LambdaA_2 = 0
+[I.2]: LambdaA_1 * TA = 0
+[I.3]: LambdaA_2 * (1-TB-TA) = 0
+[I.4]: LambdaA_1,LambdaA_2 >= 0
+[I.5]: 0 <= TA <= 1 - TB
+-------------------------------------------------------------------------------------------------------------------
+                               [KKT OP II]
+-------------------------------------------------------------------------------------------------------------------  
+[II.1]: DLb(TA,TB) = Db(TA,TB) + LambdaB_1 - LambdaB_2 = 0
+[II.2]: LambdaB_1 * TB = 0
+[II.3]: LambdaB_2 * (1-TA-TB) = 0
+[II.4]: LambdaB_1,LambdaB_2 >= 0
+[II.5]: 0 <= TB <= 1 - TA
+-------------------------------------------------------------------------------------------------------------------
+                               [COMBINED OP]
+------------------------------------------------------------------------------------------------------------------- 
+[C.1a]: F(TA,TB,LambdaA_1,LambdaA_2,LambdaB_1,LambdaB_2) = 
+       [Da(TA,TB) + LamdaA_1 - LambdaA_2] + [Db(TA,TB) + LamdaB_1 - LambdaB_2]
+[C.2]: LambdaA_1 * TA = 0
+[C.3]: LambdaA_2 * (1-TB-TA) = 0
+[C.4]: LambdaB_1 * TB = 0
+[C.5]: LambdaB_2 * (1-TA-TB) = 0
+[C.6]: [Da(TA,TB) + LamdaA_1 - LambdaA_2] = (>=) 0
+[C.7]: [Db(TA,TB) + LamdaB_1 - LambdaB_2] = (>=) 0
+[C.8]: LambdaA_1,LambdaA_2,LambdaB_1,LambdaB_2 >= 0
+[C.9]: 0 <= TA + TB <= 1
+-------------------------------------------------------------------------------------------------------------------
+[C.1a]: COMBINED OPTIMIZATION OBJECTIVE FUNCTION [6 VARIABLES]
+[C.2]: NON-LINEAR EQUALITY CONSTRAINT
+[C.3]: NON-LINEAR EQUALITY CONSTRAINT
+[C.4]: NON-LINEAR EQUALITY CONSTRAINT
+[C.5]: NON-LINEAR EQUALITY CONSTRAINT
+[C.6]: NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[C.7]: NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[C.8]: LAGRANGIAN OPTIMIZATION VARIABLES LOWER BOUNDS
+[C.9]: LINEAR INEQUALITY CONSTRAINTS
+-------------------------------------------------------------------------------------------------------------------
+The minimization process for the combined objective function defined in  
+[C.1] should ideally reach an optimal tuple
+(TA*,TB*,LambdaA_1*,LambdaA_2*,LambdaB_1*,LambdaB_2*) such that:
+F(TA*,TB*,LambdaA_1*,LambdaA_2*,LambdaB_1*,LambdaB_2*) = 0 with each component
+of the summation being zero as well. Therefore, we need to explicitly impose
+the non-linear equality versions of the constraints [C.6] and [C.7].
+-------------------------------------------------------------------------------------------------------------------
+Mind that a reasonable alternative for [C.1a] would be minimizing the sum of 
+squares so that:
+[C.1b]: F(TA,TB,LambdaA_1,LambdaA_2,LambdaB_1,LambdaB_2) = 
+                                         2                                    2 
+       [Da(TA,TB) + LamdaA_1 - LambdaA_2] + [Db(TA,TB) + LamdaB_1 - LambdaB_2]
+
+Also mind that constraining the quantities in [C.6] and [C.7] to be non-negative
+is imposed by the need to obtain minimum values as close to zero as possible for each
+one of the squared expressions.
+-------------------------------------------------------------------------------------------------------------------
+Another issue of major importance concerncs the fact that all previous optimization
+problem formulations are derived under the assumption that the competition-related
+parameter beta is non-negative (beta >= 0) which in turn implies that no additional
+linear constraints should be imposed on the optimization variables TA and TB. Such a
+requirement arises from the necessity to constraint the optimal demand functions
+  *                                *
+Qa  = alpha * XA + beta * XB and Qb  = alpha * XB + beta * XA (given that c =0)
+to be strictly non-negative:
+                               *           * 
+                            (Qa >= 0 and Qb  >= 0)
+-------------------------------------------------------------------------------------------------------------------
+                               [AUGMENTED OP: beta >= 0]
+-------------------------------------------------------------------------------------------------------------------
+Another approach for addressing the underlying continuous game with coupled 
+constraints is to consider the augmented version of the combined 
+optimization problem which merges the individual profit and Lagrangian 
+functions as shown below. The following declarations are also required:
+-------------------------------------------------------------------------------------------------------------------
+F(TA,TB;ta,tb): is the augmented profit function defined as: 
+                F(TA,TB;ta,tb) = Fa(ta;TB) + Fb(TA;tb)
+L(TA,TB;ta,tb): is the augmented Lagrangian function defined as:
+                                                    T
+                L(TA,TB;ta,tb) = F(TA,TB;ta,tb) + MU * G(TA,TB;ta,tb)
+G(TA,TB;ta,tb): is the augmented vector constraint function defined as:
+                G(TA,TB;Ta,Tb) = [ga(ta) gb(tb) Gab(TA,TB;ta,tb)]
+g(TA,TB): is the vector constraint function defined as:
+          g(TA,TB) = [ga(TA) gb(TB) gab(TA,TB)
+ga(TA): is the constraint function providing the lower limit of the decision
+        variable controlled by Firm A defined as:
+        ga(TA) = TA [i.e. ga(TA) >= 0 or TA >= 0]
+gb(TB): is the constraint function providing the lower limit of the decision
+        variable controlled by Firm B defined as:
+        gb(TB) = TB [i.e. gb(TB) >= 0 or TB >= 0]
+gab(TA,TB): is the mixed constraint function providing the upper limit for 
+            both decision variables defined as:
+            gab(TA,TB) = 1 - TA - TB [i.e. gab(TA,TB) >= 0 or TA + TB <= 1]
+Gab(TA,TB,ta,tb): is the augmented mixed constraint function providing the 
+                  upper limit for both decision variables defined as:
+                  Gab(TA,TB;ta,tb) = gab(ta;TB) + gab(TA;tb) 
+MU: is the vector of Lagrangian multipliers defined as: 
+    MU = [MUa MUb MUab]
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta >= 0 Version 1.0]
+-------------------------------------------------------------------------------------------------------------------
+           d L  |
+[III.1]: ------ |         = 0
+           d ta |[ta=TA]
+
+           d L  |
+[III.2]: ------ |         = 0
+           d tb |[tb=TB]
+
+[III.3]: MU  * g(TA,TB)   = 0
+[ΙΙΙ.4]: MU >= 0[1 x 3]
+[III.5]: g(TA,TB) >= 0[1 x 3]
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta >= 0 Version 2.0]
+-------------------------------------------------------------------------------------------------------------------
+
+         d F(TA,TB;ta,tb) |              T   d G(TA,TB;ta,tb) |
+[IV.1]: ----------------- |         +  MU * ----------------- |        = 0
+              d ta        |[ta=TA]               d ta         |[ta=TA]
+
+         d F(TA,TB;ta,tb) |              T   d G(TA,TB;ta,tb) |
+[IV.2]: ----------------- |         +  MU *  ---------------- |        = 0
+              d tb        |[tb=TB]               d tb         |[tb=TB]
+
+[IV.3]: MUa * ga(TA) + MUb * gb(TB) + MUab * gab(TA,TB) = 0
+
+[IV.4a]: MUa  >= 0 
+[IV.4b]: MUb  >= 0
+[IV.4c]: MUab >= 0
+
+[IV.5a]: ga(TA) >= 0 <=> TA >= 0
+[IV.5b]: gb(TB) >= 0 <=> TB >= 0
+[IV.5c]: gab(TA,TB) >= <=> 1 - TA - TB >= 0
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta >= 0 Version 3.0]
+------------------------------------------------------------------------------------------------------------------- 
+        d Fa(ta;TB) |                   d ga(ta) |                  
+[V.1]: ------------ |         +  MUa * --------- |         + ...
+        d ta        |[ta=TA]            d ta     |[ta=TA]
+                                      
+                              
+                                         d Gab(TA,TB;ta,tb) |
+                              +   MUab * ------------------ |         = 0
+                                         d ta               |[ta=TA]
+
+        d Fb(ta;TB) |                   d gb(tb) |                  
+[V.2]: ------------ |         +  MUb * --------- |         + ...
+        d tb        |[tb=TB]            d tb     |[tb=TB]
+                                      
+                              
+                                         d Gab(TA,TB;ta,tb) |
+                              +   MUab * ------------------ |         = 0
+                                         d tb               |[tb=TB]
+
+[V.3a]: MUa * TA = 0
+[V.3b]: MUb * TB = 0
+[V.3c]: MUab * (1 - TA - TB) = 0
+
+[V.4a]: MUa  >= 0 
+[V.4b]: MUb  >= 0
+[V.4c]: MUab >= 0
+
+[V.5a]: TA >= 0
+[V.5b]: TB >= 0
+[V.5c]: 1 - TA - TB >= 0
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta >= 0 Version 4.0]
+------------------------------------------------------------------------------------------------------------------- 
+         d Fa(ta;TB) |                   d ga(ta) |                  
+[VI.1]: ------------ |         +  MUa * --------- |         + ...
+         d ta        |[ta=TA]            d ta     |[ta=TA]
+                                      
+                              
+                                         d gab(ta;TB)       |
+                              +   MUab * ------------------ |         = 0
+                                         d ta               |[ta=TA]
+
+         d Fb(ta;TB) |                   d gb(tb) |                  
+[VI.2]: ------------ |         +  MUb * --------- |         + ...
+         d tb        |[tb=TB]            d tb     |[tb=TB]
+                                      
+                              
+                                         d gab(TA;tb)       |
+                              +   MUab * ------------------ |         = 0
+                                         d tb               |[tb=TB]
+
+[VI.3a]: MUa * TA = 0
+[VI.3b]: MUb * TB = 0
+[VI.3c]: MUab * (1 - TA - TB) = 0
+
+[VI.4a]: MUa  >= 0 
+[VI.4b]: MUb  >= 0
+[VI.4c]: MUab >= 0
+
+[VI.5a]: TA >= 0
+[VI.5b]: TB >= 0
+[VI.5c]: 1 - TA - TB >= 0
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta >= 0 Version 5.0]
+------------------------------------------------------------------------------------------------------------------- 
+         d Fa(TA;TB)                                    
+[VII.1]: ----------- + MUa - MUab = 0
+         d TA
+
+         d Fb(TA;TB)                                    
+[VII.2]: ----------- + MUb - MUab = 0
+         d TB                         
+
+[VII.3a]: MUa * TA = 0
+[VII.3b]: MUb * TB = 0
+[VII.3c]: MUab * (1 - TA - TB) = 0
+
+[VII.4a]: MUa  >= 0 
+[VII.4b]: MUb  >= 0
+[VII.4c]: MUab >= 0
+
+[VII.5a]: TA >= 0
+[VII.5b]: TB >= 0
+[VII.5c]: 1 - TA - TB >= 0
+-------------------------------------------------------------------------------------------------------------------
+                          [COMBINED AUGMENTED OP: beta >= 0]
+------------------------------------------------------------------------------------------------------------------- 
+                                 -                         -  2 
+                                |  d Fa(TA,TB)              | 
+[D.1]: F(TA,TB,MUa,MUb,MUab) =  | ------------ + MUa - MUab |     + 
+                                |  d TA                     |
+                                 -                         -
+
+                                 -                         -  2 
+                                |  d Fb(TA,TB)              | 
+                                | ------------ + MUb - MUab |      
+                                |  d TB                     |
+                                 -                         -
+
+[D.2]: MUa * TA = 0
+
+[D.3]: MUb * TB = 0
+
+[D.4]: MUab * (1 - TA - TB) = 0
+
+                       -                         -
+        d L           |  d Fa(TA,TB)              |
+[D.5]: ------ >=0 <=> | ------------ + MUa - MUab |  >= 0
+        d TA          |  d TA                     |
+                       -                         -
+
+                       -                         -
+        d L           |  d Fb(TA,TB)              |
+[D.6]: ------ >=0 <=> | ------------ + MUb - MUab |  >= 0
+        d TB          |  d TB                     |
+                       -                         -
+
+[D.7]: MUa >= 0, MUb >= 0 , MUab >= 0
+
+[D.8]: 0 <= TA + TB <= 1
+------------------------------------------------------------------------------------------------------------------- 
+[D.1]: COMBINED OPTIMIZATION OBJECTIVE FUNCTION [5 VARIABLES]
+[D.2]: NON-LINEAR EQUALITY CONSTRAINT
+[D.3]: NON-LINEAR EQUALITY CONSTRAINT
+[D.4]: NON-LINEAR EQUALITY CONSTRAINT
+[D.5]: NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[D.6]: NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[D.7]: LAGRANGIAN OPTIMIZATION VARIABLES LOWER BOUNDS
+[D.8]: LINEAR INEQUALITY CONSTRAINTS
+-------------------------------------------------------------------------------------------------------------------
+The following analysis focuses on the last derivation steps for the case where the
+competition-related parameter beta is negative (beta < 0). Mind that for this 
+particular caseb the vector of Lagrangian multipliers will be of the following form:
+MU = [MUa MUb MUab1 MUab2 MUab3]
+-------------------------------------------------------------------------------------------------------------------
+                       [KKT AUGMENTED OP: beta < 0 Version 5.0]
+------------------------------------------------------------------------------------------------------------------- 
+         d Fa(TA;TB)                                    
+[Ao.1]: ----------- + MUa - MUab1 + alpha * LB * MUab2 + beta * LB * MUab3 = 0
+         d TA
+
+         d Fb(TA;TB)                                    
+[Ao.2]: ----------- + MUb - MUab1 + beta * LA * MUab2 + alpha * LA * MUab3 = 0
+         d TB                         
+
+[Ao.3a]: MUa * TA = 0
+[Ao.3b]: MUb * TB = 0
+[Ao.3c]: MUab1 * (1 - TA - TB) = 0
+[Αo.3d]: MUab2 * (alpha * LB * TA + beta * LA * TB + LA * LB * (alpha * PA + beta * PB)) = 0
+[Ao.3e]: MUab3 * (beta * LB * TA + alpha * LA * TB + LA * LB * (alpha * PB + beta * PA)) = 0
+
+[Ao.4a]: MUa   >= 0 
+[Ao.4b]: MUb   >= 0
+[Ao.4c]: MUab1 >= 0
+[Ao.4d]: MUab2 >= 0
+[Ao.4e]: MUab3 >= 0
+
+[Ao.5a]: TA >= 0
+[Ao.5b]: TB >= 0
+[Ao.5c]: 1 - TA - TB >= 0
+[Ao.5d]: alpha * LB * TA + beta * LA * TB + LA * LB * (alpha * PA + beta * PB) >= 0
+[Ao.5e]: beta * LB * TA + alpha * LA * TB + LA * LB * (alpha * PB + beta * PA) >= 0
+-------------------------------------------------------------------------------------------------------------------
+                          [COMBINED AUGMENTED OP: beta < 0]
+------------------------------------------------------------------------------------------------------------------- 
+                                  -                                                                     -  2 
+                                 |  d Fa(TA,TB)                                                         | 
+[Bo.1]: F(TA,TB,MUa,MUb,MUab) =  | ------------ + MUa - MUab1 + alpha * LB * MUab2 + beta * LB * MUab3  |     + 
+                                 |  d TA                                                                |
+                                  -                                                                    -
+
+                                 -                                                                     -  2 
+                                |  d Fb(TA,TB)                                                         | 
+                                | ------------ + MUb -  MUab1 + beta * LA * MUab2 + alpha * LA * MUab3 |      
+                                |  d TB                                                                |
+                                 -                                                                    -
+
+[Bo.2]: MUa * TA = 0
+
+[Bo.3]: MUb * TB = 0
+
+[Bo.4]: MUab1 * (1 - TA - TB) = 0
+
+[Bo.5]: MUab2 * (alpha * LB * TA + beta * LA * TB + LA * LB * (alpha * PA + beta * PB)) = 0
+
+[Bo.6]: MUab3 * (beta * LB * TA + alpha * LA * TB + LA * LB * (alpha * PB + beta * PA)) = 0
+
+                        -                                                                   -
+        d L            |  d Fa(TA,TB)                                                        |
+[Bo.7]: ------ >=0 <=> | ------------ + MUa - MUab1 + alpha * LB * MUab2 + beta * LB * MUab3 |  >= 0
+        d TA           |  d TA                                                               |
+                        -                                                                   -
+
+                        -                                                                    -
+        d L            |  d Fb(TA,TB)                                                         |
+[Bo.8]: ------ >=0 <=> | ------------ + MUb - MUab1  + beta * LA * MUab2 + alpha * LA * MUab3 |  >= 0
+        d TB           |  d TB                                                                |
+                        -                                                                    -
+
+[Bo.9]: MUa >= 0, MUb >= 0 , MUab1 >= 0 ,MUab2 >= 0, MUab3 >= 0
+
+[Bo.10]: 0 <= TA + TB <= 1
+
+[Bo.11]: -alpha * LB * TA - beta * LA * TB - LA * LB * (alpha * PA + beta * PB) <= 0
+
+[Βo.12]: -beta * LB * TA - alpha * LA * TB - LA * LB * (alpha * PB + beta * PA) <= 0
+------------------------------------------------------------------------------------------------------------------- 
+[Bo.1]:  COMBINED OPTIMIZATION OBJECTIVE FUNCTION [7 VARIABLES]
+[Bo.2]:  NON-LINEAR EQUALITY CONSTRAINT
+[Bo.3]:  NON-LINEAR EQUALITY CONSTRAINT
+[Bo.4]:  NON-LINEAR EQUALITY CONSTRAINT
+[Bo.5]:  NON-LINEAR EQUALITY CONSTRAINT
+[Bo.6]:  NON-LINEAR EQUALITY CONSTRAINT
+[Bo.7]:  NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[Bo.8]:  NON-LINEAR EQUALITY CONSTRAINT ==> NON-LINEAR INEQUALITY CONSTRAINT
+[Bo.9]:  LAGRANGIAN OPTIMIZATION VARIABLES LOWER BOUNDS
+[Bo.10]: LINEAR INEQUALITY CONSTRAINTS
+[Bo.11]: LINEAR INEQUALITY CONSTRAINTS
+[Bo.12]: LINEAR INEQUALITY CONSTRAINTS
+-------------------------------------------------------------------------------------------------------------------
+                                                  IMPORTANT NOTE
+-------------------------------------------------------------------------------------------------------------------
+Mind that the non-linear constraints [Bo.7] and [Bo.8] are actually not contributing anything to the optimization 
+problem. They could be replaced by imposing non-negativity constraints on the profit functions Fa and Fb such that:
+Fa >= 0 and Fb >= 0.
+-------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,882 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ExperimentVisualizer</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-02-04"><meta name="DC.source" content="ExperimentVisualizer.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% This script file provides fundamental visualization functionality for a</span>
+<span class="comment">% particular experimentation scenario stored within one of the following</span>
+<span class="comment">% files:</span>
+<span class="comment">%</span>
+<span class="comment">%   (i): 'Varying_PA_BETA_NEG_X.mat' with X in {0,...,12}</span>
+<span class="comment">%  (ii): 'Varying_LA_BETA_NEG_X.mat' with X in {0,...,12}</span>
+<span class="comment">% (iii): 'Varying_K_X.mat' with X in {0,...,6}</span>
+<span class="comment">%  (iv): 'Varying_M_X.mat' with X in {0,...,6}</span>
+
+<span class="comment">% Each one from the above .mat files stores an Experiment structure storing</span>
+<span class="comment">% the individual information concerning the endogenous and exogenous model</span>
+<span class="comment">% variables for the corresponding experiment.</span>
+
+<span class="comment">% Clear command window and workspace.</span>
+clc
+clear
+<span class="comment">% Set the MinimumDigitsAccuracy parameter used throughout the</span>
+<span class="comment">% experimentation.</span>
+MinimumDigitsAccuracy = 7;
+<span class="comment">% Set folder containing the experimentation .mat files.</span>
+ExperimentFolder = <span class="string">'experiments'</span>;
+<span class="comment">% Set the filename prefix.</span>
+PREFIX = <span class="string">'Varying_PA_BETA_NEG_0'</span>;
+<span class="comment">% Set the filename to loaded.</span>
+FileName = sprintf(<span class="string">'%s.mat'</span>,PREFIX);
+<span class="comment">% Compose the full file name for the current experiment.</span>
+CombinedFileName = fullfile(ExperimentFolder,FileName);
+<span class="comment">% Load the experimentation file.</span>
+load(CombinedFileName);
+
+<span class="comment">% Determine the valid ids for which the optimimation process terminated</span>
+<span class="comment">% successfully.</span>
+idx = find(Experiment.Topts(:,1)~=-1);
+
+<span class="comment">% Get the values of the varying parameter (t) for the current experiment.</span>
+t = Experiment.Parameters{Experiment.ParamIndex};
+<span class="comment">% Get the name of the varying parameter.</span>
+ParamName = Experiment.ParamsNames{Experiment.ParamIndex};
+<span class="comment">% Get the valid values for the varying parameter.</span>
+t = t(idx)';
+<span class="comment">% Get the internal parameters LA, LB, mu and kappa.</span>
+LA = Experiment.Parameters{1};
+<span class="keyword">if</span>(length(LA)&gt;1)
+    LA = LA(idx)';
+<span class="keyword">end</span>
+LB = Experiment.Parameters{2};
+<span class="keyword">if</span>(length(LB)&gt;1)
+    LB = LB(idx)';
+<span class="keyword">end</span>
+mu = Experiment.Parameters{5};
+<span class="keyword">if</span>(length(mu)&gt;1)
+    mu = mu(idx)';
+<span class="keyword">end</span>
+kappa = Experiment.Parameters{6};
+<span class="keyword">if</span>(length(kappa)&gt;1)
+    kappa = kappa(idx)';
+<span class="keyword">end</span>
+<span class="comment">% Compute the values of the parameters alpha and beta.</span>
+alpha = (kappa .* mu - 2) ./ (mu.^2 - 4);
+beta = (2*kappa - mu) ./ (mu.^2 - 4);
+
+<span class="comment">% Get the optimal investment levels per firm.</span>
+TA = Experiment.Topts(idx,1);
+TB = Experiment.Topts(idx,2);
+<span class="comment">% Compute the values of the quantity So = LA*LB + LB*TA + LA*TB.</span>
+So = LA .* LB + LB .* TA + LA .* TB;
+<span class="comment">% Compute an approximation for the first derivatives of the optimization</span>
+<span class="comment">% variables TA and TB with respect to the varying exogenous parameter t.</span>
+dTA = diff(TA);
+dTB = diff(TB);
+dt = diff(t);
+dTAdt = dTA ./ dt;
+dTBdt = dTB ./ dt;
+<span class="comment">% Define a structure of additional input arguments to be used by the</span>
+<span class="comment">% plotting functions.</span>
+ExtraParams.LA = LA;
+ExtraParams.LB = LB;
+ExtraParams.alpha = alpha;
+ExtraParams.beta = beta;
+ExtraParams.So = So;
+ExtraParams.dTAdt = dTAdt;
+ExtraParams.dTBdt = dTBdt;
+<span class="comment">% Set the current variable index.</span>
+VariableIndex = 1;
+<span class="comment">% Plot curves TA and TB along with their first derivatives.</span>
+PlotCurves(VariableIndex,Experiment.ParamIndex,TA,TB,t,MinimumDigitsAccuracy);
+
+<span class="comment">% Get the optimal limiting influences per firm.</span>
+SA = Experiment.Sopts(idx,1);
+SB = Experiment.Sopts(idx,3);
+<span class="comment">% Compute an approximation for the first derivatives of the optimization</span>
+<span class="comment">% variables SA and SB with respect to the varying exogenous parameter t.</span>
+dSA = diff(SA);
+dSB = diff(SB);
+dt = diff(t);
+dSAdt = dSA ./ dt;
+dSBdt = dSB ./ dt;
+<span class="comment">% Set the current variable index.</span>
+VariableIndex = 2;
+<span class="comment">% Plot curves SA and SB along with their first derivatives.</span>
+PlotCurves(VariableIndex,Experiment.ParamIndex,SA,SB,t,MinimumDigitsAccuracy);
+
+<span class="comment">% Get the optimal limiting beliefs per firm.</span>
+XA = Experiment.Xopts(idx,1);
+XB = Experiment.Xopts(idx,2);
+<span class="comment">% Compute an approximation for the first derivatives of the optimization</span>
+<span class="comment">% variables XA and XB with respect to the varying exogenous parameter t.</span>
+dXA = diff(XA);
+dXB = diff(XB);
+dt = diff(t);
+dXAdt = dXA ./ dt;
+dXBdt = dXB ./ dt;
+<span class="comment">% Set the current variable index.</span>
+VariableIndex = 3;
+<span class="comment">% Plot curves SA and SB along with their first derivatives.</span>
+PlotCurves(VariableIndex,Experiment.ParamIndex,XA,XB,t,MinimumDigitsAccuracy);
+
+<span class="comment">% Get the optimal quantities per firm.</span>
+QA = Experiment.Qopts(idx,1);
+QB = Experiment.Qopts(idx,2);
+<span class="comment">% Compute an approximation for the first derivatives of the optimization</span>
+<span class="comment">% variables QA and QB with respect to the varying exogenous parameter t.</span>
+dQA = diff(QA);
+dQB = diff(QB);
+dt = diff(t);
+dQAdt = dQA ./ dt;
+dQBdt = dQB ./ dt;
+<span class="comment">% Set the current variable index.</span>
+VariableIndex = 5;
+<span class="comment">% Plot curves QA and QB along with their first derivatives.</span>
+PlotCurves(VariableIndex,Experiment.ParamIndex,QA,QB,t,MinimumDigitsAccuracy);
+
+<span class="comment">% Get the optimal profits per firm.</span>
+FA = Experiment.Fopts(idx,1);
+FB = Experiment.Fopts(idx,4);
+<span class="comment">% Set the current variable index.</span>
+VariableIndex = 6;
+<span class="comment">% Plot curves FA and FB along with their first derivatives.</span>
+PlotCurves(VariableIndex,Experiment.ParamIndex,FA,FB,t,MinimumDigitsAccuracy);
+
+<span class="keyword">function</span> [color_a,color_b] = PlotColors(VA,VB,MinimumDigitsAccuracy)
+
+<span class="comment">% This function checks whether the optimal values for variables VA and VB</span>
+<span class="comment">% are the same so as to use the same color for plotting purposes.</span>
+
+<span class="comment">% Define the rgb colors to be used for plotting the variables of each</span>
+<span class="comment">% experiment.</span>
+RedColor   =  [(255/255),(0/255),(0/255)];
+GreenColor =  [(0/255),(128/255),(0/255)];
+BlueColor  =  [(0/255),(0/255),(255/255)];
+
+<span class="comment">% Get the absolute difference of values between variables VA and VB.</span>
+dV = abs(VA-VB);
+<span class="comment">% Compute the average absolute difference.</span>
+dV = (1/length(dV)) * sum(dV);
+
+<span class="comment">% If the average absolute difference is less than the minimum digits</span>
+<span class="comment">% accuracy, then variables VA and VB are considered to have the same</span>
+<span class="comment">% values.</span>
+<span class="keyword">if</span>(dV &lt; 10^(-MinimumDigitsAccuracy))
+    color_a = BlueColor;
+    color_b = BlueColor;
+<span class="keyword">else</span>
+    color_a = RedColor;
+    color_b = GreenColor;
+<span class="keyword">end</span>
+
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> PlotCurves(VariableIndex,ParamIndex,VA,VB,t,MinimumDigitsAccuracy)
+
+<span class="comment">% This function performs the actual plotting of curves VA and VB as well as</span>
+<span class="comment">% the first derivatives of the quantities VA and VB with respect to the</span>
+<span class="comment">% varying parameter.</span>
+
+<span class="comment">% Set the string names of the optimal endogenous parameters to be plotted</span>
+<span class="comment">% in Latex notation.</span>
+VariablesNames = {<span class="string">'T^{\ast}'</span>,<span class="string">'s^{\ast}'</span>,<span class="string">'x^{\ast}'</span>,<span class="string">'p^{\ast}'</span>,<span class="keyword">...</span>
+                  <span class="string">'q^{\ast}'</span>,<span class="string">'\Pi^{\ast}'</span>,<span class="string">'R^{\ast}'</span>,<span class="string">'C^{\ast}'</span>};
+
+<span class="comment">% Set the string names of the exogenous parameters in Latex notation.</span>
+ParamsNames = {<span class="string">'\lambda_A'</span>,<span class="string">'\lambda_B'</span>,<span class="string">'p_A^{(0)}'</span>,<span class="string">'p_B^{(0)}'</span>,<span class="keyword">...</span>
+               <span class="string">'\mu'</span>,<span class="string">'\kappa'</span>,<span class="string">'c'</span>,<span class="string">'\gamma'</span>};
+
+<span class="comment">% Set the figure name strings.</span>
+FigureNameStrings = {<span class="string">'Optimal Investment Levels'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Limiting Influences'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Limiting Beliefs'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Prices'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Quantities'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Profits'</span>,<span class="keyword">...</span>
+                     <span class="string">'Optimal Revenues'</span>,<span class="string">'Optimal Costs'</span>};
+
+<span class="comment">% Set the derivatives figure name strings.</span>
+DerivativeFigureNameStrings = {<span class="string">'Optimal Investment Levels Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Limiting Influences Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Limiting Beliefs Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Prices Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Quantities Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Profits Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Revenues Derivatives'</span>,<span class="keyword">...</span>
+                               <span class="string">'Optimal Costs Derivatives'</span>};
+
+<span class="comment">% Set the name of the endogenous optimization variable to be plotted.</span>
+VariableName = VariablesNames{VariableIndex};
+<span class="comment">% Set the name of the exogenous model parameter to be plotted.</span>
+ParamName = ParamsNames{ParamIndex};
+<span class="comment">% Set the name of the figure.</span>
+FigureName = FigureNameStrings{VariableIndex};
+<span class="comment">% Set the title of the figure.</span>
+FigureTitle = sprintf(<span class="string">'%s_A(%s) vs %s_B(%s)'</span>,VariableName,ParamName,VariableName,ParamName);
+<span class="comment">% Set the x-axis label of the figure.</span>
+XLabel = ParamName;
+<span class="comment">% Set the y-axis lable of the figure.</span>
+YLabel = sprintf(<span class="string">'%s_A / %s_B'</span>,VariableName,VariableName);
+<span class="comment">% Get the color for each curve.</span>
+[color_a,color_b] = PlotColors(VA,VB,MinimumDigitsAccuracy);
+
+<span class="comment">% Do the actual plotting for the optimal optimization variables of the</span>
+<span class="comment">% model with respect to the varying exogenous parameter.</span>
+figure(<span class="string">'Name'</span>,FigureName);
+title(FigureTitle,<span class="string">'fontsize'</span>,14);
+xlabel(XLabel,<span class="string">'fontsize'</span>,14);
+ylabel(YLabel,<span class="string">'fontsize'</span>,14);
+hold <span class="string">on</span>
+plot_a = plot(t,VA,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+plot_b = plot(t,VB,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+set(plot_a,<span class="string">'Color'</span>,color_a);
+set(plot_b,<span class="string">'Color'</span>,color_b);
+axes = gca;
+axes.LineWidth = 1.0;
+axes.GridAlpha = 0.4;
+grid <span class="string">on</span>
+hold <span class="string">off</span>
+
+<span class="comment">% Compute an approximation for the first derivatives of the optimization</span>
+<span class="comment">% variables of the model with respect to the varying exogenous parameter.</span>
+dVA = diff(VA);
+dVB = diff(VB);
+dt = diff(t);
+dVAdt = dVA ./ dt;
+dVBdt = dVB ./ dt;
+
+<span class="comment">% Set the name of the figure for the first derivatives.</span>
+FigureName = DerivativeFigureNameStrings{VariableIndex};
+<span class="comment">% Set the title of the figure for the first derivatives.</span>
+FigureTitle = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                      VariableName,ParamName,VariableName,ParamName);
+<span class="comment">% Set the x-axis label of the figure for the first derivatives.</span>
+XLabel = ParamName;
+<span class="comment">% Set the y-axis lable of the figure for the first derivatives.</span>
+YLabel = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                 VariableName,ParamName,VariableName,ParamName);
+<span class="comment">% Get the color for each curve for the first derivatives.</span>
+[color_a,color_b] = PlotColors(dVAdt,dVBdt,MinimumDigitsAccuracy);
+
+<span class="comment">% Do the actual plotting for the first derivative of the optimal</span>
+<span class="comment">% optimization variables of the model with respect to the varying</span>
+<span class="comment">% exogenous parameter.</span>
+figure(<span class="string">'Name'</span>,FigureName);
+title(FigureTitle,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+xlabel(XLabel,<span class="string">'fontsize'</span>,14);
+ylabel(YLabel,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+hold <span class="string">on</span>
+plot_a = plot(t(2:end),dVAdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+plot_b = plot(t(2:end),dVBdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+set(plot_a,<span class="string">'Color'</span>,color_a);
+set(plot_b,<span class="string">'Color'</span>,color_b);
+axes = gca;
+axes.LineWidth = 1.0;
+axes.GridAlpha = 0.4;
+grid <span class="string">on</span>
+hold <span class="string">off</span>
+
+
+
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> PlotEstimatedDerivatives(VariableIndex,ParamIndex,VA,VB,t,ExtraParams,MinimumDigitsAccuracy)
+
+<span class="comment">% Unfold the contents the exra parameters structure.</span>
+LA = ExtraParams.LA;
+LB = ExtraParams.LB;
+alpha = ExtraParams.alpha;
+beta = ExtraParams.beta;
+So = ExtraParams.So;
+dTAdt = ExtraParams.dTAdt;
+dTBdt = ExtraParams.dTBdt;
+
+<span class="comment">% Set the string names of the optimal endogenous parameters to be plotted</span>
+<span class="comment">% in Latex notation.</span>
+VariablesNames = {<span class="string">'T^{\ast}'</span>,<span class="string">'s^{\ast}'</span>,<span class="string">'x^{\ast}'</span>,<span class="string">'p^{\ast}'</span>,<span class="keyword">...</span>
+                  <span class="string">'q^{\ast}'</span>,<span class="string">'\Pi^{\ast}'</span>,<span class="string">'R^{\ast}'</span>,<span class="string">'C^{\ast}'</span>};
+
+<span class="comment">% Set the string names of the exogenous parameters in Latex notation.</span>
+ParamsNames = {<span class="string">'\lambda_A'</span>,<span class="string">'\lambda_B'</span>,<span class="string">'p_A^{(0)}'</span>,<span class="string">'p_B^{(0)}'</span>,<span class="keyword">...</span>
+               <span class="string">'\mu'</span>,<span class="string">'\kappa'</span>,<span class="string">'c'</span>,<span class="string">'\gamma'</span>};
+
+<span class="comment">% Set the estimated derivatives figure name strings.</span>
+EstimatedDerivativeFigureNameStrings = {<span class="string">'Optimal Investment Levels Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Limiting Influences Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Limiting Beliefs Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Prices Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Quantities Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Profits Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Revenues Estimated Derivatives'</span>,<span class="keyword">...</span>
+                                        <span class="string">'Optimal Costs Estimated Derivatives'</span>};
+
+<span class="comment">% Set the name of the endogenous optimization variable to be plotted.</span>
+VariableName = VariablesNames{VariableIndex};
+<span class="comment">% Set the name of the exogenous model parameter to be plotted.</span>
+ParamName = ParamsNames{ParamIndex};
+
+<span class="comment">% Compute the estimated derivatives for the endogenous model variables:</span>
+<span class="comment">% SA SB XA XB QA QB.</span>
+
+<span class="comment">% Compute the estimated derivatives only for values of the VariableIndex</span>
+<span class="comment">% in {2,3,5}.</span>
+<span class="keyword">switch</span> VariableIndex
+    <span class="comment">% (i)  : theta_SA / theta_TA =  (LB/So) * (1 - SA)</span>
+    <span class="comment">% (ii) : theta_SA / theta_TB = -(LA/So) * SA</span>
+    <span class="comment">% (iii): theta_SB / theta_TB =  (LA/So) * (1 - SB)</span>
+    <span class="comment">% (iv) : theta_SB / theat_TA = -(LB/So) * SB</span>
+    <span class="keyword">case</span> 2
+        theta_SA_theta_TA =  (LB ./ So) .* (1 - VA);
+        theta_SA_theta_TB = -(LA ./ So) .* VA;
+        theta_SB_theta_TB =  (LA ./ So) .* (1 - VB);
+        theta_SB_theta_TA = -(LB ./ So) .* VB;
+        dSAdt = theta_SA_theta_TA(2:end) .* dTAdt + theta_SA_theta_TB(2:end) .* dTBdt;
+        dSBdt = theta_SB_theta_TA(2:end) .* dTAdt + theta_SB_theta_TB(2:end) .* dTBdt;
+
+        <span class="comment">% Set the name of the figure for the estimated first derivatives.</span>
+        FigureName = EstimatedDerivativeFigureNameStrings{VariableIndex};
+        <span class="comment">% Set the title of the figure for the estimated first derivatives.</span>
+        FigureTitle = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                      VariableName,ParamName,VariableName,ParamName);
+        <span class="comment">% Set the x-axis label of the figure for the estimated first derivatives.</span>
+        XLabel = ParamName;
+        <span class="comment">% Set the y-axis lable of the figure for the estimated first derivatives.</span>
+        YLabel = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                 VariableName,ParamName,VariableName,ParamName);
+        <span class="comment">% Get the color for each curve for the estimated first derivatives.</span>
+        [color_a,color_b] = PlotColors(dSAdt,dSBdt,MinimumDigitsAccuracy);
+
+        <span class="comment">% Do the actual plotting for the estimated first derivative of the optimal</span>
+        <span class="comment">% optimization variables of the model with respect to the varying</span>
+        <span class="comment">% exogenous parameter.</span>
+        figure(<span class="string">'Name'</span>,FigureName);
+        title(FigureTitle,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+        xlabel(XLabel,<span class="string">'fontsize'</span>,14);
+        ylabel(YLabel,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+        hold <span class="string">on</span>
+        plot_a = plot(t(1:end-1),dSAdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+        plot_b = plot(t(1:end-1),dSBdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+        set(plot_a,<span class="string">'Color'</span>,color_a);
+        set(plot_b,<span class="string">'Color'</span>,color_b);
+        axes = gca;
+        axes.LineWidth = 1.0;
+        axes.GridAlpha = 0.4;
+        grid <span class="string">on</span>
+        hold <span class="string">off</span>
+    <span class="comment">% (i)  : theta_XA / theta_TA =  (LB/So) * (1 - XA)</span>
+    <span class="comment">% (ii) : theta_XA / theta_TB = -(LA/So) * XA</span>
+    <span class="comment">% (iii): theta_XB / theta_TB =  (LA/So) * (1 - XB)</span>
+    <span class="comment">% (iv) : theta_XB / theat_TA = -(LB/So) * XB</span>
+    <span class="keyword">case</span> 3
+        theta_XA_theta_TA =  (LB ./ So) .* (1 - VA);
+        theta_XA_theta_TB = -(LA ./ So) .* VA;
+        theta_XB_theta_TB =  (LA ./ So) .* (1 - VB);
+        theta_XB_theta_TA = -(LB ./ So) .* VB;
+        dXAdt = theta_XA_theta_TA(2:end) .* dTAdt + theta_XA_theta_TB(2:end) .* dTBdt;
+        dXBdt = theta_XB_theta_TA(2:end) .* dTAdt + theta_XB_theta_TB(2:end) .* dTBdt;
+
+        <span class="comment">% Set the name of the figure for the estimated first derivatives.</span>
+        FigureName = EstimatedDerivativeFigureNameStrings{VariableIndex};
+        <span class="comment">% Set the title of the figure for the estimated first derivatives.</span>
+        FigureTitle = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                      VariableName,ParamName,VariableName,ParamName);
+        <span class="comment">% Set the x-axis label of the figure for the estimated first derivatives.</span>
+        XLabel = ParamName;
+        <span class="comment">% Set the y-axis lable of the figure for the estimated first derivatives.</span>
+        YLabel = sprintf(<span class="string">'$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$'</span>,<span class="keyword">...</span>
+                 VariableName,ParamName,VariableName,ParamName);
+        <span class="comment">% Get the color for each curve for the estimated first derivatives.</span>
+        [color_a,color_b] = PlotColors(dXAdt,dXBdt,MinimumDigitsAccuracy);
+
+        <span class="comment">% Do the actual plotting for the estimated first derivative of the optimal</span>
+        <span class="comment">% optimization variables of the model with respect to the varying</span>
+        <span class="comment">% exogenous parameter.</span>
+        figure(<span class="string">'Name'</span>,FigureName);
+        title(FigureTitle,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+        xlabel(XLabel,<span class="string">'fontsize'</span>,14);
+        ylabel(YLabel,<span class="string">'fontsize'</span>,14,<span class="string">'Interpreter'</span>,<span class="string">'latex'</span>);
+        hold <span class="string">on</span>
+        plot_a = plot(t(1:end-1),dXAdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+        plot_b = plot(t(1:end-1),dXBdt,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2.5);
+        set(plot_a,<span class="string">'Color'</span>,color_a);
+        set(plot_b,<span class="string">'Color'</span>,color_b);
+        axes = gca;
+        axes.LineWidth = 1.0;
+        axes.GridAlpha = 0.4;
+        grid <span class="string">on</span>
+        hold <span class="string">off</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="ExperimentVisualizer_01.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_02.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_03.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_04.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_05.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_06.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_07.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_08.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_09.png" alt=""> <img vspace="5" hspace="5" src="ExperimentVisualizer_10.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% This script file provides fundamental visualization functionality for a
+% particular experimentation scenario stored within one of the following
+% files:
+%
+%   (i): 'Varying_PA_BETA_NEG_X.mat' with X in {0,...,12}
+%  (ii): 'Varying_LA_BETA_NEG_X.mat' with X in {0,...,12}
+% (iii): 'Varying_K_X.mat' with X in {0,...,6}
+%  (iv): 'Varying_M_X.mat' with X in {0,...,6}
+
+% Each one from the above .mat files stores an Experiment structure storing
+% the individual information concerning the endogenous and exogenous model
+% variables for the corresponding experiment.
+
+% Clear command window and workspace.
+clc
+clear
+% Set the MinimumDigitsAccuracy parameter used throughout the
+% experimentation.
+MinimumDigitsAccuracy = 7;
+% Set folder containing the experimentation .mat files.
+ExperimentFolder = 'experiments';
+% Set the filename prefix.
+PREFIX = 'Varying_PA_BETA_NEG_0';
+% Set the filename to loaded.
+FileName = sprintf('%s.mat',PREFIX);
+% Compose the full file name for the current experiment.
+CombinedFileName = fullfile(ExperimentFolder,FileName);
+% Load the experimentation file.
+load(CombinedFileName);
+
+% Determine the valid ids for which the optimimation process terminated
+% successfully.
+idx = find(Experiment.Topts(:,1)~=-1);
+
+% Get the values of the varying parameter (t) for the current experiment.
+t = Experiment.Parameters{Experiment.ParamIndex};
+% Get the name of the varying parameter.
+ParamName = Experiment.ParamsNames{Experiment.ParamIndex};
+% Get the valid values for the varying parameter.
+t = t(idx)';
+% Get the internal parameters LA, LB, mu and kappa.
+LA = Experiment.Parameters{1};
+if(length(LA)>1)
+    LA = LA(idx)';
+end
+LB = Experiment.Parameters{2};
+if(length(LB)>1)
+    LB = LB(idx)';
+end
+mu = Experiment.Parameters{5};
+if(length(mu)>1)
+    mu = mu(idx)';
+end
+kappa = Experiment.Parameters{6};
+if(length(kappa)>1)
+    kappa = kappa(idx)';
+end
+% Compute the values of the parameters alpha and beta.
+alpha = (kappa .* mu - 2) ./ (mu.^2 - 4);
+beta = (2*kappa - mu) ./ (mu.^2 - 4);
+
+% Get the optimal investment levels per firm.
+TA = Experiment.Topts(idx,1);
+TB = Experiment.Topts(idx,2);
+% Compute the values of the quantity So = LA*LB + LB*TA + LA*TB.
+So = LA .* LB + LB .* TA + LA .* TB;
+% Compute an approximation for the first derivatives of the optimization
+% variables TA and TB with respect to the varying exogenous parameter t.
+dTA = diff(TA);
+dTB = diff(TB);
+dt = diff(t);
+dTAdt = dTA ./ dt;
+dTBdt = dTB ./ dt;
+% Define a structure of additional input arguments to be used by the
+% plotting functions.
+ExtraParams.LA = LA;
+ExtraParams.LB = LB;
+ExtraParams.alpha = alpha;
+ExtraParams.beta = beta;
+ExtraParams.So = So;
+ExtraParams.dTAdt = dTAdt;
+ExtraParams.dTBdt = dTBdt;
+% Set the current variable index.
+VariableIndex = 1;
+% Plot curves TA and TB along with their first derivatives.
+PlotCurves(VariableIndex,Experiment.ParamIndex,TA,TB,t,MinimumDigitsAccuracy);
+
+% Get the optimal limiting influences per firm.
+SA = Experiment.Sopts(idx,1);
+SB = Experiment.Sopts(idx,3);
+% Compute an approximation for the first derivatives of the optimization
+% variables SA and SB with respect to the varying exogenous parameter t.
+dSA = diff(SA);
+dSB = diff(SB);
+dt = diff(t);
+dSAdt = dSA ./ dt;
+dSBdt = dSB ./ dt;
+% Set the current variable index.
+VariableIndex = 2;
+% Plot curves SA and SB along with their first derivatives.
+PlotCurves(VariableIndex,Experiment.ParamIndex,SA,SB,t,MinimumDigitsAccuracy);
+
+% Get the optimal limiting beliefs per firm.
+XA = Experiment.Xopts(idx,1);
+XB = Experiment.Xopts(idx,2);
+% Compute an approximation for the first derivatives of the optimization
+% variables XA and XB with respect to the varying exogenous parameter t.
+dXA = diff(XA);
+dXB = diff(XB);
+dt = diff(t);
+dXAdt = dXA ./ dt;
+dXBdt = dXB ./ dt;
+% Set the current variable index.
+VariableIndex = 3;
+% Plot curves SA and SB along with their first derivatives.
+PlotCurves(VariableIndex,Experiment.ParamIndex,XA,XB,t,MinimumDigitsAccuracy);
+
+% Get the optimal quantities per firm.
+QA = Experiment.Qopts(idx,1);
+QB = Experiment.Qopts(idx,2);
+% Compute an approximation for the first derivatives of the optimization
+% variables QA and QB with respect to the varying exogenous parameter t.
+dQA = diff(QA);
+dQB = diff(QB);
+dt = diff(t);
+dQAdt = dQA ./ dt;
+dQBdt = dQB ./ dt;
+% Set the current variable index.
+VariableIndex = 5;
+% Plot curves QA and QB along with their first derivatives.
+PlotCurves(VariableIndex,Experiment.ParamIndex,QA,QB,t,MinimumDigitsAccuracy);
+
+% Get the optimal profits per firm.
+FA = Experiment.Fopts(idx,1);
+FB = Experiment.Fopts(idx,4);
+% Set the current variable index.
+VariableIndex = 6;
+% Plot curves FA and FB along with their first derivatives.
+PlotCurves(VariableIndex,Experiment.ParamIndex,FA,FB,t,MinimumDigitsAccuracy);
+
+function [color_a,color_b] = PlotColors(VA,VB,MinimumDigitsAccuracy)
+
+% This function checks whether the optimal values for variables VA and VB
+% are the same so as to use the same color for plotting purposes.
+
+% Define the rgb colors to be used for plotting the variables of each
+% experiment.
+RedColor   =  [(255/255),(0/255),(0/255)];
+GreenColor =  [(0/255),(128/255),(0/255)];
+BlueColor  =  [(0/255),(0/255),(255/255)];
+
+% Get the absolute difference of values between variables VA and VB.
+dV = abs(VA-VB);
+% Compute the average absolute difference.
+dV = (1/length(dV)) * sum(dV);
+
+% If the average absolute difference is less than the minimum digits
+% accuracy, then variables VA and VB are considered to have the same
+% values.
+if(dV < 10^(-MinimumDigitsAccuracy))
+    color_a = BlueColor;
+    color_b = BlueColor;
+else
+    color_a = RedColor;
+    color_b = GreenColor;
+end
+
+end
+
+function PlotCurves(VariableIndex,ParamIndex,VA,VB,t,MinimumDigitsAccuracy)
+
+% This function performs the actual plotting of curves VA and VB as well as
+% the first derivatives of the quantities VA and VB with respect to the
+% varying parameter.
+
+% Set the string names of the optimal endogenous parameters to be plotted 
+% in Latex notation.
+VariablesNames = {'T^{\ast}','s^{\ast}','x^{\ast}','p^{\ast}',...
+                  'q^{\ast}','\Pi^{\ast}','R^{\ast}','C^{\ast}'};
+
+% Set the string names of the exogenous parameters in Latex notation.
+ParamsNames = {'\lambda_A','\lambda_B','p_A^{(0)}','p_B^{(0)}',...
+               '\mu','\kappa','c','\gamma'};
+
+% Set the figure name strings.
+FigureNameStrings = {'Optimal Investment Levels',...
+                     'Optimal Limiting Influences',...
+                     'Optimal Limiting Beliefs',...
+                     'Optimal Prices',...
+                     'Optimal Quantities',...
+                     'Optimal Profits',...
+                     'Optimal Revenues','Optimal Costs'};
+                 
+% Set the derivatives figure name strings.
+DerivativeFigureNameStrings = {'Optimal Investment Levels Derivatives',...
+                               'Optimal Limiting Influences Derivatives',...
+                               'Optimal Limiting Beliefs Derivatives',...
+                               'Optimal Prices Derivatives',...
+                               'Optimal Quantities Derivatives',...
+                               'Optimal Profits Derivatives',...
+                               'Optimal Revenues Derivatives',...
+                               'Optimal Costs Derivatives'};
+
+% Set the name of the endogenous optimization variable to be plotted.
+VariableName = VariablesNames{VariableIndex};
+% Set the name of the exogenous model parameter to be plotted.
+ParamName = ParamsNames{ParamIndex};
+% Set the name of the figure.
+FigureName = FigureNameStrings{VariableIndex};
+% Set the title of the figure.
+FigureTitle = sprintf('%s_A(%s) vs %s_B(%s)',VariableName,ParamName,VariableName,ParamName);
+% Set the x-axis label of the figure.
+XLabel = ParamName;
+% Set the y-axis lable of the figure.
+YLabel = sprintf('%s_A / %s_B',VariableName,VariableName);
+% Get the color for each curve.
+[color_a,color_b] = PlotColors(VA,VB,MinimumDigitsAccuracy);
+
+% Do the actual plotting for the optimal optimization variables of the 
+% model with respect to the varying exogenous parameter.
+figure('Name',FigureName);
+title(FigureTitle,'fontsize',14);
+xlabel(XLabel,'fontsize',14);
+ylabel(YLabel,'fontsize',14);
+hold on
+plot_a = plot(t,VA,'-','LineWidth',2.5);
+plot_b = plot(t,VB,'-','LineWidth',2.5);
+set(plot_a,'Color',color_a);
+set(plot_b,'Color',color_b);
+axes = gca;
+axes.LineWidth = 1.0;
+axes.GridAlpha = 0.4;
+grid on
+hold off
+
+% Compute an approximation for the first derivatives of the optimization
+% variables of the model with respect to the varying exogenous parameter.
+dVA = diff(VA);
+dVB = diff(VB);
+dt = diff(t);
+dVAdt = dVA ./ dt;
+dVBdt = dVB ./ dt;
+
+% Set the name of the figure for the first derivatives.
+FigureName = DerivativeFigureNameStrings{VariableIndex};
+% Set the title of the figure for the first derivatives.
+FigureTitle = sprintf('$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$',...
+                      VariableName,ParamName,VariableName,ParamName);
+% Set the x-axis label of the figure for the first derivatives.
+XLabel = ParamName;
+% Set the y-axis lable of the figure for the first derivatives.
+YLabel = sprintf('$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$',...
+                 VariableName,ParamName,VariableName,ParamName);
+% Get the color for each curve for the first derivatives.
+[color_a,color_b] = PlotColors(dVAdt,dVBdt,MinimumDigitsAccuracy);
+
+% Do the actual plotting for the first derivative of the optimal
+% optimization variables of the model with respect to the varying
+% exogenous parameter.
+figure('Name',FigureName);
+title(FigureTitle,'fontsize',14,'Interpreter','latex');
+xlabel(XLabel,'fontsize',14);
+ylabel(YLabel,'fontsize',14,'Interpreter','latex');
+hold on
+plot_a = plot(t(2:end),dVAdt,'-','LineWidth',2.5);
+plot_b = plot(t(2:end),dVBdt,'-','LineWidth',2.5);
+set(plot_a,'Color',color_a);
+set(plot_b,'Color',color_b);
+axes = gca;
+axes.LineWidth = 1.0;
+axes.GridAlpha = 0.4;
+grid on
+hold off
+
+
+
+end
+
+function PlotEstimatedDerivatives(VariableIndex,ParamIndex,VA,VB,t,ExtraParams,MinimumDigitsAccuracy)
+
+% Unfold the contents the exra parameters structure.
+LA = ExtraParams.LA;
+LB = ExtraParams.LB;
+alpha = ExtraParams.alpha;
+beta = ExtraParams.beta;
+So = ExtraParams.So;
+dTAdt = ExtraParams.dTAdt;
+dTBdt = ExtraParams.dTBdt;
+
+% Set the string names of the optimal endogenous parameters to be plotted 
+% in Latex notation.
+VariablesNames = {'T^{\ast}','s^{\ast}','x^{\ast}','p^{\ast}',...
+                  'q^{\ast}','\Pi^{\ast}','R^{\ast}','C^{\ast}'};
+
+% Set the string names of the exogenous parameters in Latex notation.
+ParamsNames = {'\lambda_A','\lambda_B','p_A^{(0)}','p_B^{(0)}',...
+               '\mu','\kappa','c','\gamma'};
+
+% Set the estimated derivatives figure name strings.
+EstimatedDerivativeFigureNameStrings = {'Optimal Investment Levels Estimated Derivatives',...
+                                        'Optimal Limiting Influences Estimated Derivatives',...
+                                        'Optimal Limiting Beliefs Estimated Derivatives',...
+                                        'Optimal Prices Estimated Derivatives',...
+                                        'Optimal Quantities Estimated Derivatives',...
+                                        'Optimal Profits Estimated Derivatives',...
+                                        'Optimal Revenues Estimated Derivatives',...
+                                        'Optimal Costs Estimated Derivatives'};
+
+% Set the name of the endogenous optimization variable to be plotted.
+VariableName = VariablesNames{VariableIndex};
+% Set the name of the exogenous model parameter to be plotted.
+ParamName = ParamsNames{ParamIndex};
+                                                                   
+% Compute the estimated derivatives for the endogenous model variables:
+% SA SB XA XB QA QB.
+
+% Compute the estimated derivatives only for values of the VariableIndex
+% in {2,3,5}.
+switch VariableIndex
+    % (i)  : theta_SA / theta_TA =  (LB/So) * (1 - SA)
+    % (ii) : theta_SA / theta_TB = -(LA/So) * SA
+    % (iii): theta_SB / theta_TB =  (LA/So) * (1 - SB)
+    % (iv) : theta_SB / theat_TA = -(LB/So) * SB
+    case 2
+        theta_SA_theta_TA =  (LB ./ So) .* (1 - VA);
+        theta_SA_theta_TB = -(LA ./ So) .* VA;
+        theta_SB_theta_TB =  (LA ./ So) .* (1 - VB);
+        theta_SB_theta_TA = -(LB ./ So) .* VB;
+        dSAdt = theta_SA_theta_TA(2:end) .* dTAdt + theta_SA_theta_TB(2:end) .* dTBdt;
+        dSBdt = theta_SB_theta_TA(2:end) .* dTAdt + theta_SB_theta_TB(2:end) .* dTBdt;
+        
+        % Set the name of the figure for the estimated first derivatives.
+        FigureName = EstimatedDerivativeFigureNameStrings{VariableIndex};
+        % Set the title of the figure for the estimated first derivatives.
+        FigureTitle = sprintf('$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$',...
+                      VariableName,ParamName,VariableName,ParamName);
+        % Set the x-axis label of the figure for the estimated first derivatives.
+        XLabel = ParamName;
+        % Set the y-axis lable of the figure for the estimated first derivatives.
+        YLabel = sprintf('$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$',...
+                 VariableName,ParamName,VariableName,ParamName);
+        % Get the color for each curve for the estimated first derivatives.
+        [color_a,color_b] = PlotColors(dSAdt,dSBdt,MinimumDigitsAccuracy);
+
+        % Do the actual plotting for the estimated first derivative of the optimal
+        % optimization variables of the model with respect to the varying
+        % exogenous parameter.
+        figure('Name',FigureName);
+        title(FigureTitle,'fontsize',14,'Interpreter','latex');
+        xlabel(XLabel,'fontsize',14);
+        ylabel(YLabel,'fontsize',14,'Interpreter','latex');
+        hold on
+        plot_a = plot(t(1:end-1),dSAdt,'-','LineWidth',2.5);
+        plot_b = plot(t(1:end-1),dSBdt,'-','LineWidth',2.5);
+        set(plot_a,'Color',color_a);
+        set(plot_b,'Color',color_b);
+        axes = gca;
+        axes.LineWidth = 1.0;
+        axes.GridAlpha = 0.4;
+        grid on
+        hold off
+    % (i)  : theta_XA / theta_TA =  (LB/So) * (1 - XA)
+    % (ii) : theta_XA / theta_TB = -(LA/So) * XA
+    % (iii): theta_XB / theta_TB =  (LA/So) * (1 - XB)
+    % (iv) : theta_XB / theat_TA = -(LB/So) * XB
+    case 3
+        theta_XA_theta_TA =  (LB ./ So) .* (1 - VA);
+        theta_XA_theta_TB = -(LA ./ So) .* VA;
+        theta_XB_theta_TB =  (LA ./ So) .* (1 - VB);
+        theta_XB_theta_TA = -(LB ./ So) .* VB;
+        dXAdt = theta_XA_theta_TA(2:end) .* dTAdt + theta_XA_theta_TB(2:end) .* dTBdt;
+        dXBdt = theta_XB_theta_TA(2:end) .* dTAdt + theta_XB_theta_TB(2:end) .* dTBdt;
+        
+        % Set the name of the figure for the estimated first derivatives.
+        FigureName = EstimatedDerivativeFigureNameStrings{VariableIndex};
+        % Set the title of the figure for the estimated first derivatives.
+        FigureTitle = sprintf('$$\\frac{d%s_A}{d%s}~\\textrm{vs}~\\frac{d%s_B}{d%s}$$',...
+                      VariableName,ParamName,VariableName,ParamName);
+        % Set the x-axis label of the figure for the estimated first derivatives.
+        XLabel = ParamName;
+        % Set the y-axis lable of the figure for the estimated first derivatives.
+        YLabel = sprintf('$$\\frac{d%s_A}{d%s} / \\frac{d%s_B}{d%s}$$',...
+                 VariableName,ParamName,VariableName,ParamName);
+        % Get the color for each curve for the estimated first derivatives.
+        [color_a,color_b] = PlotColors(dXAdt,dXBdt,MinimumDigitsAccuracy);
+
+        % Do the actual plotting for the estimated first derivative of the optimal
+        % optimization variables of the model with respect to the varying
+        % exogenous parameter.
+        figure('Name',FigureName);
+        title(FigureTitle,'fontsize',14,'Interpreter','latex');
+        xlabel(XLabel,'fontsize',14);
+        ylabel(YLabel,'fontsize',14,'Interpreter','latex');
+        hold on
+        plot_a = plot(t(1:end-1),dXAdt,'-','LineWidth',2.5);
+        plot_b = plot(t(1:end-1),dXBdt,'-','LineWidth',2.5);
+        set(plot_a,'Color',color_a);
+        set(plot_b,'Color',color_b);
+        axes = gca;
+        axes.LineWidth = 1.0;
+        axes.GridAlpha = 0.4;
+        grid on
+        hold off
+end
+end
+##### SOURCE END #####
+--></body></html>

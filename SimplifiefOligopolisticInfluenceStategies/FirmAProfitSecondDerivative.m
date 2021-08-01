@@ -1,6 +1,6 @@
 function [DDa] = FirmAProfitSecondDerivative(C,G,LA,LB,PA,PB,alpha,beta,gamma,TA,TB)
 
-% This function evaluates the first derivative of the profit for Firm A for 
+% This function evaluates the second derivative of the profit for Firm A for 
 % the Simplified Oligopolistic Optimal Influence Model. The derivative value 
 % (DDa) is evaluated either on a single pair of (TA,TB) values or on a 
 % meshgrid of all possible  (TA,TB) pairs which is constructed by  
@@ -50,7 +50,7 @@ CZa = [ LB^4, 4*LA*LB^3, 4*LA*LB^4, 6*LA^2*LB^2, 12*LA^2*LB^3, 6*LA^2*LB^4, ...
 % Get the sizes of input variable TA and TB.
 [ra,ca] = size(TA);
 [rb,cb] = size(TB);
-% Compute the value of Da for the case where TA and TB are single-valued
+% Compute the value of DDa for the case where TA and TB are single-valued
 % vectors.
 if(ra*ca*rb*cb==1)
    TWa = [ TA^4, TA^3*TB, TA^3, TA^2*TB^2, TA^2*TB, TA^2, TA*TB^3, TA*TB^2, TA*TB, TA, TB^4, TB^3, TB^2, TB, 1];
@@ -58,7 +58,7 @@ if(ra*ca*rb*cb==1)
    Wa = CWa * TWa';
    Za = CZa * TZa';
    DDa = Wa ./ Za;    
-% Compute the value of Da for the case where TA and TB are matrices of the
+% Compute the value of DDa for the case where TA and TB are matrices of the
 % underlying meshgrid.
 else
    TWa = {TA.^4, (TA.^3).*TB, TA.^3, (TA.^2).*(TB.^2), (TA.^2).*TB, TA.^2, TA.*(TB.^3), TA.*(TB.^2), TA.*TB, TA, TB.^4, TB.^3, TB.^2, TB, 1};
@@ -67,12 +67,11 @@ else
    Za = zeros(rb,cb);
    for t = 1:1:length(CWa)
       Wa = Wa + CWa(t)*TWa{t};      
-   end;
+   end
    for t = 1:1:length(CZa)
       Za = Za + CZa(t)*TZa{t};
-   end;
+   end
    DDa = Wa ./ Za;
-end;    
+end    
     
 end
-
