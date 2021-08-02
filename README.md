@@ -1,1 +1,1 @@
-# OptimalInfluenceStrategies
+# Optimal InfluenceS trategies
